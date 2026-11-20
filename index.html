@@ -1,0 +1,1157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Demurrage Calculator</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f4f6f8;
+  margin:0;
+  padding:30px;
+  color:#222;
+}
+
+.container{
+  max-width:950px;
+  margin:auto;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:25px;
+}
+
+.card{
+  background:#fff;
+  border-radius:14px;
+  padding:20px;
+  margin-bottom:25px;
+  box-shadow:0 6px 16px rgba(0,0,0,0.08);
+}
+
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+  margin-bottom:14px;
+}
+
+label{
+  display:flex;
+  flex-direction:column;
+  font-size:14px;
+  font-weight:600;
+}
+
+input,
+select{
+  width:100%;
+  margin-top:5px;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccd2d8;
+  font-size:14px;
+  background:white;
+}
+
+input:focus,
+select:focus{
+  outline:none;
+  border-color:#2d6cdf;
+  box-shadow:0 0 0 2px rgba(45,108,223,0.12);
+}
+
+.help-text{
+  margin-top:6px;
+  color:#6c757d;
+  font-size:12px;
+  font-weight:normal;
+  line-height:1.4;
+}
+
+button{
+  width:100%;
+  padding:12px;
+  background:#2d6cdf;
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-size:15px;
+  font-weight:bold;
+  cursor:pointer;
+  margin-top:8px;
+}
+
+button:hover{
+  background:#1f4fa3;
+}
+
+.result{
+  font-size:22px;
+  font-weight:bold;
+  text-align:center;
+  margin:18px 0;
+  color:#d32f2f;
+}
+
+.summary{
+  font-size:15px;
+  line-height:1.6;
+  margin:12px 0;
+  padding:12px;
+  background:#f8f9fa;
+  border-left:4px solid #2d6cdf;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:15px;
+}
+
+th,
+td{
+  border:1px solid #e3e7eb;
+  padding:10px;
+  text-align:center;
+}
+
+th{
+  background:#f0f3f6;
+  font-weight:600;
+}
+
+.date-col{
+  width:110px;
+}
+
+.free-row{
+  background:#edf7ed;
+}
+
+.total-row{
+  background:#f8f9fa;
+  font-weight:bold;
+}
+
+.hidden{
+  display:none;
+}
+
+@media(max-width:700px){
+
+  body{
+    padding:15px;
+  }
+
+  .row{
+    grid-template-columns:1fr;
+  }
+
+  .table-wrapper{
+    overflow-x:auto;
+  }
+
+  table{
+    min-width:720px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<h1>Demurrage Calculator</h1>
+
+<div class="card">
+
+<div class="row">
+
+<label>
+Container type
+
+<select id="containerType">
+
+<option value="20 Dry">20' Dry</option>
+<option value="20 Dry Hazardous">20' Dry Hazardous</option>
+
+<option value="40 Dry">40' Dry</option>
+<option value="40 Dry Hazardous">40' Dry Hazardous</option>
+
+<option value="20 Special">20' Special</option>
+<option value="20 Special Hazardous">20' Special Hazardous</option>
+
+<option value="40 Special">40' Special</option>
+<option value="40 Special Hazardous">40' Special Hazardous</option>
+
+<option value="20 Reefer">20' Reefer</option>
+<option value="20 Reefer Hazardous">20' Reefer Hazardous</option>
+
+<option value="40 Reefer">40' Reefer</option>
+<option value="40 Reefer Hazardous">40' Reefer Hazardous</option>
+
+<option value="20 Reefer NoR">20' Reefer NoR</option>
+<option value="20 Reefer NoR Hazardous">20' Reefer NoR Hazardous</option>
+
+<option value="40 Reefer NoR">40' Reefer NoR</option>
+<option value="40 Reefer NoR Hazardous">40' Reefer NoR Hazardous</option>
+
+<option value="45 Dry">45' Dry</option>
+<option value="45 Dry Hazardous">45' Dry Hazardous</option>
+
+<option value="45 Reefer NoR">45' Reefer NoR</option>
+<option value="45 Reefer NoR Hazardous">45' Reefer NoR Hazardous</option>
+
+</select>
+</label>
+
+
+<label>
+Applicable free time
+
+<input
+  type="number"
+  id="freeDays"
+  min="0"
+  step="1"
+  placeholder="Enter free days">
+
+<span class="help-text">
+Enter the number of free calendar days applicable to this shipment.
+</span>
+
+</label>
+
+</div>
+
+
+<div class="row">
+
+<label>
+Discharge date
+
+<input
+  type="date"
+  id="dischargeDate">
+
+</label>
+
+
+<label>
+Empty return date
+
+<input
+  type="date"
+  id="returnDate">
+
+</label>
+
+</div>
+
+
+<button onclick="calculateDemurrage()">
+Calculate Demurrage
+</button>
+
+
+<div
+  class="result"
+  id="result">
+</div>
+
+
+<div
+  class="summary hidden"
+  id="summary">
+</div>
+
+
+<div
+  class="table-wrapper hidden"
+  id="tableWrapper">
+
+<table id="calculationTable">
+
+<thead>
+<tr>
+  <th>Period</th>
+  <th class="date-col">From</th>
+  <th class="date-col">To</th>
+  <th>Days</th>
+  <th>Rate USD</th>
+  <th>Amount USD</th>
+</tr>
+</thead>
+
+<tbody></tbody>
+
+<tfoot>
+<tr class="total-row">
+  <td colspan="5">Total demurrage</td>
+  <td id="tableTotal">0.00</td>
+</tr>
+</tfoot>
+
+</table>
+
+</div>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ==========================================
+   DEMURRAGE TARIFFS
+========================================== */
+
+const tariffs = {
+
+  "20 Dry":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:15},
+      {name:"Period 2",days:7,rate:35},
+      {name:"Thereafter",days:Infinity,rate:45}
+    ]
+  },
+
+  "20 Dry Hazardous":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:20},
+      {name:"Period 2",days:7,rate:45},
+      {name:"Thereafter",days:Infinity,rate:55}
+    ]
+  },
+
+  "40 Dry":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:30},
+      {name:"Period 2",days:7,rate:70},
+      {name:"Thereafter",days:Infinity,rate:90}
+    ]
+  },
+
+  "40 Dry Hazardous":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:40},
+      {name:"Period 2",days:7,rate:90},
+      {name:"Thereafter",days:Infinity,rate:110}
+    ]
+  },
+
+  "20 Special":{
+    standardFreeDays:11,
+    periods:[
+      {name:"Period 1",days:3,rate:25},
+      {name:"Period 2",days:7,rate:60},
+      {name:"Thereafter",days:Infinity,rate:70}
+    ]
+  },
+
+  "20 Special Hazardous":{
+    standardFreeDays:11,
+    periods:[
+      {name:"Period 1",days:3,rate:33},
+      {name:"Period 2",days:7,rate:78},
+      {name:"Thereafter",days:Infinity,rate:90}
+    ]
+  },
+
+  "40 Special":{
+    standardFreeDays:11,
+    periods:[
+      {name:"Period 1",days:3,rate:50},
+      {name:"Period 2",days:7,rate:125},
+      {name:"Thereafter",days:Infinity,rate:145}
+    ]
+  },
+
+  "40 Special Hazardous":{
+    standardFreeDays:11,
+    periods:[
+      {name:"Period 1",days:3,rate:65},
+      {name:"Period 2",days:7,rate:161},
+      {name:"Thereafter",days:Infinity,rate:183}
+    ]
+  },
+
+  "20 Reefer":{
+    standardFreeDays:7,
+    periods:[
+      {name:"Period 1",days:3,rate:65},
+      {name:"Thereafter",days:Infinity,rate:100}
+    ]
+  },
+
+  "20 Reefer Hazardous":{
+    standardFreeDays:7,
+    periods:[
+      {name:"Period 1",days:3,rate:85},
+      {name:"Thereafter",days:Infinity,rate:130}
+    ]
+  },
+
+  "40 Reefer":{
+    standardFreeDays:7,
+    periods:[
+      {name:"Period 1",days:3,rate:100},
+      {name:"Thereafter",days:Infinity,rate:210}
+    ]
+  },
+
+  "40 Reefer Hazardous":{
+    standardFreeDays:7,
+    periods:[
+      {name:"Period 1",days:3,rate:130},
+      {name:"Thereafter",days:Infinity,rate:267}
+    ]
+  },
+
+  "20 Reefer NoR":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:15},
+      {name:"Period 2",days:7,rate:35},
+      {name:"Thereafter",days:Infinity,rate:45}
+    ]
+  },
+
+  "20 Reefer NoR Hazardous":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:20},
+      {name:"Period 2",days:7,rate:45},
+      {name:"Thereafter",days:Infinity,rate:55}
+    ]
+  },
+
+  "40 Reefer NoR":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:30},
+      {name:"Period 2",days:7,rate:70},
+      {name:"Thereafter",days:Infinity,rate:90}
+    ]
+  },
+
+  "40 Reefer NoR Hazardous":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:40},
+      {name:"Period 2",days:7,rate:90},
+      {name:"Thereafter",days:Infinity,rate:110}
+    ]
+  },
+
+  "45 Dry":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:35},
+      {name:"Period 2",days:7,rate:80},
+      {name:"Thereafter",days:Infinity,rate:101}
+    ]
+  },
+
+  "45 Dry Hazardous":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:46},
+      {name:"Period 2",days:7,rate:103},
+      {name:"Thereafter",days:Infinity,rate:125}
+    ]
+  },
+
+  "45 Reefer NoR":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:35},
+      {name:"Period 2",days:7,rate:80},
+      {name:"Thereafter",days:Infinity,rate:101}
+    ]
+  },
+
+  "45 Reefer NoR Hazardous":{
+    standardFreeDays:12,
+    periods:[
+      {name:"Period 1",days:2,rate:46},
+      {name:"Period 2",days:7,rate:103},
+      {name:"Thereafter",days:Infinity,rate:125}
+    ]
+  }
+
+};
+
+
+/* ==========================================
+   DATE FUNCTIONS
+========================================== */
+
+function parseDate(dateString){
+
+  const [year,month,day] =
+    dateString.split("-").map(Number);
+
+  return new Date(
+    year,
+    month-1,
+    day
+  );
+}
+
+
+function formatDate(date){
+
+  if(!date || isNaN(date)){
+    return "—";
+  }
+
+  const day =
+    String(date.getDate()).padStart(2,"0");
+
+  const month =
+    String(date.getMonth()+1).padStart(2,"0");
+
+  const year =
+    date.getFullYear();
+
+  return `${day}.${month}.${year}`;
+}
+
+
+function addDays(date,days){
+
+  const result =
+    new Date(date);
+
+  result.setDate(
+    result.getDate()+days
+  );
+
+  return result;
+}
+
+
+function daysBetweenInclusive(start,end){
+
+  const startUTC =
+    Date.UTC(
+      start.getFullYear(),
+      start.getMonth(),
+      start.getDate()
+    );
+
+  const endUTC =
+    Date.UTC(
+      end.getFullYear(),
+      end.getMonth(),
+      end.getDate()
+    );
+
+  return Math.floor(
+    (endUTC-startUTC)/86400000
+  )+1;
+}
+
+
+/* ==========================================
+   CLEAR RESULTS
+========================================== */
+
+function clearResults(){
+
+  document
+    .getElementById("result")
+    .textContent="";
+
+  document
+    .getElementById("summary")
+    .innerHTML="";
+
+  document
+    .getElementById("summary")
+    .classList.add("hidden");
+
+  document
+    .getElementById("tableWrapper")
+    .classList.add("hidden");
+
+  document
+    .querySelector("#calculationTable tbody")
+    .innerHTML="";
+
+  document
+    .getElementById("tableTotal")
+    .textContent="0.00";
+}
+
+
+/* ==========================================
+   CALCULATOR
+========================================== */
+
+function calculateDemurrage(){
+
+  clearResults();
+
+
+  const containerType =
+    document
+      .getElementById("containerType")
+      .value;
+
+
+  const freeDaysValue =
+    document
+      .getElementById("freeDays")
+      .value;
+
+
+  const dischargeValue =
+    document
+      .getElementById("dischargeDate")
+      .value;
+
+
+  const returnValue =
+    document
+      .getElementById("returnDate")
+      .value;
+
+
+  /* VALIDATION */
+
+  if(freeDaysValue===""){
+
+    alert(
+      "Please enter applicable free time."
+    );
+
+    return;
+  }
+
+
+  if(!dischargeValue || !returnValue){
+
+    alert(
+      "Please select both Discharge date and Empty return date."
+    );
+
+    return;
+  }
+
+
+  const freeDays =
+    Number(freeDaysValue);
+
+
+  if(
+    !Number.isInteger(freeDays) ||
+    freeDays<0
+  ){
+
+    alert(
+      "Free time must be a whole number of calendar days."
+    );
+
+    return;
+  }
+
+
+  const dischargeDate =
+    parseDate(dischargeValue);
+
+
+  const returnDate =
+    parseDate(returnValue);
+
+
+  if(
+    isNaN(dischargeDate) ||
+    isNaN(returnDate) ||
+    returnDate<dischargeDate
+  ){
+
+    alert(
+      "Empty return date must be on or after the discharge date."
+    );
+
+    return;
+  }
+
+
+  const tariff =
+    tariffs[containerType];
+
+
+  const totalDays =
+    daysBetweenInclusive(
+      dischargeDate,
+      returnDate
+    );
+
+
+  const tbody =
+    document.querySelector(
+      "#calculationTable tbody"
+    );
+
+
+  /* ======================================
+     FREE TIME
+  ====================================== */
+
+  const usedFreeDays =
+    Math.min(
+      totalDays,
+      freeDays
+    );
+
+
+  if(usedFreeDays>0){
+
+    const freeFrom =
+      new Date(dischargeDate);
+
+
+    const freeTo =
+      addDays(
+        dischargeDate,
+        usedFreeDays-1
+      );
+
+
+    tbody.innerHTML += `
+
+      <tr class="free-row">
+
+        <td>Free time</td>
+
+        <td>
+          ${formatDate(freeFrom)}
+        </td>
+
+        <td>
+          ${formatDate(freeTo)}
+        </td>
+
+        <td>
+          ${usedFreeDays}
+        </td>
+
+        <td>
+          0.00
+        </td>
+
+        <td>
+          0.00
+        </td>
+
+      </tr>
+
+    `;
+  }
+
+
+  /* ======================================
+     CHARGEABLE DAYS
+  ====================================== */
+
+  const chargeableDays =
+    Math.max(
+      0,
+      totalDays-freeDays
+    );
+
+
+  let remainingChargeableDays =
+    chargeableDays;
+
+
+  let totalAmount = 0;
+
+
+  if(remainingChargeableDays>0){
+
+    let currentDate =
+      addDays(
+        dischargeDate,
+        freeDays
+      );
+
+
+    /* ======================================
+       FT <= STANDARD FT
+
+       Charging starts from Period 1.
+    ====================================== */
+
+    if(
+      freeDays<=tariff.standardFreeDays
+    ){
+
+
+      for(const period of tariff.periods){
+
+
+        if(remainingChargeableDays<=0){
+          break;
+        }
+
+
+        const daysInPeriod =
+          period.days===Infinity
+          ? remainingChargeableDays
+          : Math.min(
+              period.days,
+              remainingChargeableDays
+            );
+
+
+        const from =
+          new Date(currentDate);
+
+
+        const to =
+          addDays(
+            currentDate,
+            daysInPeriod-1
+          );
+
+
+        const amount =
+          daysInPeriod *
+          period.rate;
+
+
+        totalAmount +=
+          amount;
+
+
+        tbody.innerHTML += `
+
+          <tr>
+
+            <td>
+              ${period.name}
+            </td>
+
+            <td>
+              ${formatDate(from)}
+            </td>
+
+            <td>
+              ${formatDate(to)}
+            </td>
+
+            <td>
+              ${daysInPeriod}
+            </td>
+
+            <td>
+              ${period.rate.toFixed(2)}
+            </td>
+
+            <td>
+              ${amount.toFixed(2)}
+            </td>
+
+          </tr>
+
+        `;
+
+
+        remainingChargeableDays -=
+          daysInPeriod;
+
+
+        currentDate =
+          addDays(
+            currentDate,
+            daysInPeriod
+          );
+
+      }
+
+    }
+
+
+    /* ======================================
+       FT > STANDARD FT
+
+       Extra free days consume tariff
+       period days.
+    ====================================== */
+
+    else{
+
+
+      const extraFreeDays =
+        freeDays -
+        tariff.standardFreeDays;
+
+
+      let tariffDaysToSkip =
+        extraFreeDays;
+
+
+      for(const period of tariff.periods){
+
+
+        if(remainingChargeableDays<=0){
+          break;
+        }
+
+
+        let skippedInThisPeriod = 0;
+
+
+        if(tariffDaysToSkip>0){
+
+
+          if(period.days===Infinity){
+
+            skippedInThisPeriod =
+              tariffDaysToSkip;
+
+          }
+
+          else{
+
+            skippedInThisPeriod =
+              Math.min(
+                period.days,
+                tariffDaysToSkip
+              );
+
+          }
+
+
+          tariffDaysToSkip -=
+            skippedInThisPeriod;
+
+        }
+
+
+        let availablePeriodDays;
+
+
+        if(period.days===Infinity){
+
+          availablePeriodDays =
+            Infinity;
+
+        }
+
+        else{
+
+          availablePeriodDays =
+            period.days -
+            skippedInThisPeriod;
+
+        }
+
+
+        if(availablePeriodDays<=0){
+          continue;
+        }
+
+
+        const daysInPeriod =
+          availablePeriodDays===Infinity
+          ? remainingChargeableDays
+          : Math.min(
+              availablePeriodDays,
+              remainingChargeableDays
+            );
+
+
+        const from =
+          new Date(currentDate);
+
+
+        const to =
+          addDays(
+            currentDate,
+            daysInPeriod-1
+          );
+
+
+        const amount =
+          daysInPeriod *
+          period.rate;
+
+
+        totalAmount +=
+          amount;
+
+
+        tbody.innerHTML += `
+
+          <tr>
+
+            <td>
+              ${period.name}
+            </td>
+
+            <td>
+              ${formatDate(from)}
+            </td>
+
+            <td>
+              ${formatDate(to)}
+            </td>
+
+            <td>
+              ${daysInPeriod}
+            </td>
+
+            <td>
+              ${period.rate.toFixed(2)}
+            </td>
+
+            <td>
+              ${amount.toFixed(2)}
+            </td>
+
+          </tr>
+
+        `;
+
+
+        remainingChargeableDays -=
+          daysInPeriod;
+
+
+        currentDate =
+          addDays(
+            currentDate,
+            daysInPeriod
+          );
+
+      }
+
+    }
+
+  }
+
+
+  /* ======================================
+     RESULT
+  ====================================== */
+
+  document
+    .getElementById("result")
+    .textContent =
+      `TOTAL: ${totalAmount.toFixed(2)} USD`;
+
+
+  let freeTimeNote = "";
+
+
+  if(
+    freeDays<tariff.standardFreeDays
+  ){
+
+    freeTimeNote = `
+
+      <br>
+
+      <b>
+        Period 1 starts immediately after Day ${freeDays}.
+      </b>
+
+    `;
+
+  }
+
+
+  else if(
+    freeDays>tariff.standardFreeDays
+  ){
+
+    freeTimeNote = `
+
+      <br>
+
+      <b>
+        Extended free time applied.
+      </b>
+
+    `;
+
+  }
+
+
+  document
+    .getElementById("summary")
+    .innerHTML = `
+
+      Container type:
+      <b>${containerType}</b>
+      <br>
+
+      Discharge date:
+      <b>${formatDate(dischargeDate)}</b>
+      <br>
+
+      Empty return date:
+      <b>${formatDate(returnDate)}</b>
+      <br>
+
+      Total period:
+      <b>${totalDays} calendar days</b>
+      <br>
+
+      Applicable free time:
+      <b>${freeDays} calendar days</b>
+      <br>
+
+      Standard tariff free time:
+      <b>${tariff.standardFreeDays} calendar days</b>
+      <br>
+
+      Chargeable demurrage:
+      <b>${chargeableDays} calendar days</b>
+
+      ${freeTimeNote}
+
+    `;
+
+
+  document
+    .getElementById("tableTotal")
+    .textContent =
+      totalAmount.toFixed(2);
+
+
+  document
+    .getElementById("summary")
+    .classList.remove("hidden");
+
+
+  document
+    .getElementById("tableWrapper")
+    .classList.remove("hidden");
+
+}
+
+</script>
+
+</body>
+</html>
